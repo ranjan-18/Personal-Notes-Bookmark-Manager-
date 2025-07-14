@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getNotes, createNote, updateNote, deleteNote } from '../services/noteService';
 import NoteCard from '../components/NoteCard';
 import NoteForm from '../components/NoteForm';
 import Modal from '../components/Modal';
 
 export default function Notes() {
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState([]);         // ✅ initialized as []
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [search, setSearch] = useState('');
@@ -15,9 +15,20 @@ export default function Notes() {
     try {
       const query = search ? `q=${search}` : '';
       const res = await getNotes(token, query);
-      setNotes(res.data);
+
+      console.log('📦 Notes API response:', res); // ✅ log to verify structure
+
+      // ✅ handle both array and { data: [...] } responses
+      if (Array.isArray(res)) {
+        setNotes(res);
+      } else if (Array.isArray(res?.data)) {
+        setNotes(res.data);
+      } else {
+        setNotes([]);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('❌ Failed to load notes:', err);
+      setNotes([]); // fallback
     }
   };
 
@@ -36,8 +47,12 @@ export default function Notes() {
   };
 
   const handleDelete = async (id) => {
-    await deleteNote(id, token);
-    loadNotes();
+    try {
+      await deleteNote(id, token);
+      loadNotes();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -63,23 +78,30 @@ export default function Notes() {
       </div>
 
       <div className="flex flex-wrap gap-4 justify-start">
-        {notes.map(note => (
-          <NoteCard
-            key={note._id}
-            note={note}
-            onEdit={(note) => {
-              setEditData(note);
-              setModalOpen(true);
-            }}
-            onDelete={handleDelete}
-          />
-        ))}
+        {Array.isArray(notes) && notes.length > 0 ? (
+          notes.map((note) => (
+            <NoteCard
+              key={note._id}
+              note={note}
+              onEdit={() => {
+                setEditData(note);
+                setModalOpen(true);
+              }}
+              onDelete={handleDelete}
+            />
+          ))
+        ) : (
+          <p className="text-gray-500">No notes found.</p>
+        )}
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => {
-        setModalOpen(false);
-        setEditData(null);
-      }}>
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setEditData(null);
+        }}
+      >
         <NoteForm
           onSubmit={handleCreate}
           initialData={editData}

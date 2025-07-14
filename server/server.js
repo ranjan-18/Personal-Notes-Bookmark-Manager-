@@ -34,11 +34,11 @@ const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes); // 👈 this enables /api/auth/register
 
 
-
+connectDB();
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    connectDB(); // Connect to MongoDB after server starts
+     // Connect to MongoDB after server starts
 });

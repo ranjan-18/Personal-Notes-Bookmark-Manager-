@@ -1,3 +1,4 @@
+import React from 'react';
 export default function NoteCard({ note, onEdit, onDelete }) {
   return (
     <div className="bg-white rounded-xl shadow-md p-4 w-full md:w-[48%] lg:w-[32%]">
