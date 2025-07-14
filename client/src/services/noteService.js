@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/notes'; // adjust in production
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/notes`; // adjust in production
 
 // Token will be passed from AuthContext (in CHUNK 9)
 const getConfig = (token) => ({

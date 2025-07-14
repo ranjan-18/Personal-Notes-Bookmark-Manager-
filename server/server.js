@@ -9,7 +9,16 @@ dotenv.config();
 // 🔥 Middleware to parse JSON bodies
 app.use(express.json());
 
-app.use(cors());
+
+
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://personal-notes-bookmark-manager-wp7.vercel.app'
+  ],
+  credentials: true
+}));
+
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
