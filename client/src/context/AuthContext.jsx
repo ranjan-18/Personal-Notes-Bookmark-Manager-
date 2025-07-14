@@ -7,14 +7,14 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) setUser(JSON.parse(storedUser));
+    const stored = localStorage.getItem('user');
+    if (stored) setUser(JSON.parse(stored));
   }, []);
 
   const loginUser = (data) => {
     setUser(data);
     localStorage.setItem('user', JSON.stringify(data));
-    localStorage.setItem('token', data.token); // if needed for API calls
+    localStorage.setItem('token', data.token);
   };
 
   const logoutUser = () => {

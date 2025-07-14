@@ -1,20 +1,56 @@
 import axios from 'axios';
 
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}/notes`; // adjust in production
+// ✅ Use Vite environment variable or fallback for local testing
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_URL = `${baseURL}/notes`;
 
-// Token will be passed from AuthContext (in CHUNK 9)
+// ✅ Helper to attach Authorization header
 const getConfig = (token) => ({
-  headers: { Authorization: `Bearer ${token}` }
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
 });
 
-export const getNotes = async (token, query = '') =>
-  axios.get(`${API_URL}?${query}`, getConfig(token));
+// ✅ GET all notes (with optional search query)
+export const getNotes = async (token, query = '') => {
+  try {
+    const res = await axios.get(`${API_URL}?${query}`, getConfig(token));
+    return res.data;
+  } catch (err) {
+    console.error('❌ Error fetching notes:', err.response?.data || err.message);
+    throw err;
+  }
+};
 
-export const createNote = async (data, token) =>
-  axios.post(API_URL, data, getConfig(token));
+// ✅ CREATE a new note
+export const createNote = async (data, token) => {
+  try {
+    const res = await axios.post(API_URL, data, getConfig(token));
+    return res.data;
+  } catch (err) {
+    console.error('❌ Error creating note:', err.response?.data || err.message);
+    throw err;
+  }
+};
 
-export const updateNote = async (id, data, token) =>
-  axios.put(`${API_URL}/${id}`, data, getConfig(token));
+// ✅ UPDATE a note by ID
+export const updateNote = async (id, data, token) => {
+  try {
+    const res = await axios.put(`${API_URL}/${id}`, data, getConfig(token));
+    return res.data;
+  } catch (err) {
+    console.error('❌ Error updating note:', err.response?.data || err.message);
+    throw err;
+  }
+};
 
-export const deleteNote = async (id, token) =>
-  axios.delete(`${API_URL}/${id}`, getConfig(token));
+// ✅ DELETE a note by ID
+export const deleteNote = async (id, token) => {
+  try {
+    const res = await axios.delete(`${API_URL}/${id}`, getConfig(token));
+    return res.data;
+  } catch (err) {
+    console.error('❌ Error deleting note:', err.response?.data || err.message);
+    throw err;
+  }
+};

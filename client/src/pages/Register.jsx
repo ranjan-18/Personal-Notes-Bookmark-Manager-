@@ -20,8 +20,9 @@ export default function Register() {
       loginUser(data);
       navigate('/notes');
     } catch (err) {
-      alert('Register failed');
-    }
+  console.error(err); // log full error to console
+  alert(err?.response?.data?.message || 'Register failed'); // show real message
+}
   };
 
   return (

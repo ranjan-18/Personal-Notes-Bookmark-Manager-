@@ -31,7 +31,8 @@ const bookmarkRoutes = require('./routes/bookmarkRoutes');
 app.use('/api/bookmarks', bookmarkRoutes);
 
 const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // 👈 this enables /api/auth/register
+
 
 
 
