@@ -3,6 +3,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
+// ✅ notice '/api/auth'
+
 const noteRoutes = require('./routes/noteRoutes');
 const bookmarkRoutes = require('./routes/bookmarkRoutes'); // ✅ Added
 
@@ -13,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ REGISTER ROUTES
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); 
 app.use('/api/notes', noteRoutes);
 app.use('/api/bookmarks', bookmarkRoutes); // ✅ Now correctly placed
 
