@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-const API_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
-// Final URL becomes: https://personal-notes-bookmark-manager-3.onrender.com/api/auth
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+if (!baseURL) {
+  console.error('❌ VITE_API_BASE_URL is missing in .env');
+}
+
+const API_URL = `${baseURL}/auth`;
+
 
 export const login = async (data) => {
   const res = await axios.post(`${API_URL}/login`, data);
@@ -12,5 +18,3 @@ export const register = async (data) => {
   const res = await axios.post(`${API_URL}/register`, data);
   return res.data;
 };
-
-

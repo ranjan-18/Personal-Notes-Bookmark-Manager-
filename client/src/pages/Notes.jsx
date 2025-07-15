@@ -3,22 +3,23 @@ import { getNotes, createNote, updateNote, deleteNote } from '../services/noteSe
 import NoteCard from '../components/NoteCard';
 import NoteForm from '../components/NoteForm';
 import Modal from '../components/Modal';
+import { useNavigate } from 'react-router-dom';
 
 export default function Notes() {
-  const [notes, setNotes] = useState([]);         // ✅ initialized as []
+  const [notes, setNotes] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [search, setSearch] = useState('');
   const token = localStorage.getItem('token');
+  const navigate = useNavigate(); // ✅ initialize navigation
 
   const loadNotes = async () => {
     try {
       const query = search ? `q=${search}` : '';
       const res = await getNotes(token, query);
 
-      console.log('📦 Notes API response:', res); // ✅ log to verify structure
+      console.log('📦 Notes API response:', res);
 
-      // ✅ handle both array and { data: [...] } responses
       if (Array.isArray(res)) {
         setNotes(res);
       } else if (Array.isArray(res?.data)) {
@@ -28,7 +29,7 @@ export default function Notes() {
       }
     } catch (err) {
       console.error('❌ Failed to load notes:', err);
-      setNotes([]); // fallback
+      setNotes([]);
     }
   };
 
@@ -69,12 +70,22 @@ export default function Notes() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button
-          onClick={() => setModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          ➕ Add Note
-        </button>
+
+        {/* ✅ Add and Bookmark Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setModalOpen(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            ➕ Add Note
+          </button>
+          <button
+            onClick={() => navigate('/bookmarks')}
+            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          >
+            📑 View Bookmarks
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-4 justify-start">

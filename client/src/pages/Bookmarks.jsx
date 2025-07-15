@@ -1,94 +1,75 @@
-import { useEffect, useState } from 'react';
-import { getBookmarks, createBookmark, updateBookmark, deleteBookmark } from '../services/bookmarkService';
-import BookmarkCard from '../components/BookmarkCard';
-import BookmarkForm from '../components/BookmarkForm';
-import Modal from '../components/Modal';
+import React, { useEffect, useState } from 'react';
+import { getBookmarks } from '../services/bookmarkService'; // ✅ Axios call from service
+import { Link } from 'react-router-dom';
 
 export default function Bookmarks() {
   const [bookmarks, setBookmarks] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editData, setEditData] = useState(null);
-  const [search, setSearch] = useState('');
-  const token = localStorage.getItem('token');
 
-  const loadBookmarks = async () => {
+  const fetchBookmarks = async () => {
     try {
-      const query = search ? `q=${search}` : '';
-      const res = await getBookmarks(token, query);
-      setBookmarks(res.data);
+      const data = await getBookmarks();
+      setBookmarks(data || []);
     } catch (err) {
-      console.error(err);
+      console.error('❌ Failed to load bookmarks:', err);
     }
-  };
-
-  const handleSave = async (data) => {
-    try {
-      if (editData) {
-        await updateBookmark(editData._id, data, token);
-      } else {
-        await createBookmark(data, token);
-      }
-      setEditData(null);
-      loadBookmarks();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    await deleteBookmark(id, token);
-    loadBookmarks();
   };
 
   useEffect(() => {
-    loadBookmarks();
-  }, [search]);
+    fetchBookmarks();
+  }, []);
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search bookmarks..."
-          className="w-full md:w-1/2 border px-4 py-2 rounded"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button
-          onClick={() => setModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          ➕ Add Bookmark
-        </button>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-slate-800">📑 Your Bookmarks</h1>
+          <Link
+            to="/notes"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-full transition"
+          >
+            ← Back to Notes
+          </Link>
+        </div>
 
-      <div className="flex flex-wrap gap-4 justify-start">
-        {bookmarks.map(bookmark => (
-          <BookmarkCard
-            key={bookmark._id}
-            bookmark={bookmark}
-            onEdit={(data) => {
-              setEditData(data);
-              setModalOpen(true);
-            }}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+        {/* Bookmark Grid */}
+        {bookmarks.length === 0 ? (
+          <p className="text-gray-500 text-center">No bookmarks saved yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {bookmarks.map((bm) => (
+              <div
+                key={bm._id}
+                className="bg-white shadow-sm border border-gray-100 rounded-xl p-5 hover:shadow-md transition"
+              >
+                <a
+                  href={bm.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-semibold text-blue-600 hover:underline block mb-2"
+                >
+                  {bm.title || bm.url}
+                </a>
 
-      <Modal isOpen={modalOpen} onClose={() => {
-        setModalOpen(false);
-        setEditData(null);
-      }}>
-        <BookmarkForm
-          onSubmit={handleSave}
-          initialData={editData}
-          close={() => {
-            setModalOpen(false);
-            setEditData(null);
-          }}
-        />
-      </Modal>
+                {bm.description && (
+                  <p className="text-sm text-gray-600 mb-2">{bm.description}</p>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {bm.tags?.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 text-xs bg-indigo-100 text-indigo-600 rounded-full"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
